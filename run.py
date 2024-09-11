@@ -16,7 +16,7 @@ class BasicPropositions:
     def __init__(self, data):
         self.data = data
 
-    def __repr__(self):
+    def _prop_name(self):
         return f"A.{self.data}"
 
 
@@ -32,7 +32,7 @@ class FancyPropositions:
     def __init__(self, data):
         self.data = data
 
-    def __repr__(self):
+    def _prop_name(self):
         return f"A.{self.data}"
 
 # Call your variables whatever you want
