@@ -1,85 +1,138 @@
+from itertools import product
+from random import randint
 
-from bauhaus import Encoding, proposition, constraint
-from bauhaus.utils import count_solutions, likelihood
+# Number of locations
+num_locations = 5
 
-# These two lines make sure a faster SAT solver is used.
-from nnf import config
-config.sat_backend = "kissat"
+# Define types of game elements
+elements = ["bridge", "river", "puzzle", "hazard", "artifact", "clue", "treasure", "rainy_weather", "marsh"]
 
-# Encoding that will store all of your constraints
-E = Encoding()
+# Initialize game elements for each location
+locations = []
+for i in range(num_locations):
+    location = {elem: f"{i}_{elem}" for elem in elements}
+    locations.append(location)
 
-# To create propositions, create classes for them first, annotated with "@proposition" and the Encoding
-@proposition(E)
-class BasicPropositions:
+# Function to create constraints
+def generate_constraints():
+    constraints = []
 
-    def __init__(self, data):
-        self.data = data
+    # Core game constraints
+    for loc in locations:
+        # Example constraints
+        constraints.append((loc["river"], loc["bridge"], loc["clue"]))  # River -> (Bridge & Clue)
+        constraints.append((loc["hazard"], loc["artifact"], loc["treasure"]))  # Hazard -> (not Artifact or not Treasure)
+        constraints.append((loc["rainy_weather"], loc["marsh"]))  # Rainy Weather -> Marsh
 
-    def _prop_name(self):
-        return f"A.{self.data}"
+    return constraints
 
+# Function to check if a solution satisfies all constraints
+def satisfies_constraints(solution, constraints):
+    for constraint in constraints:
+        if not evaluate_constraint(solution, *constraint):
+            return False
+    return True
 
-# Different classes for propositions are useful because this allows for more dynamic constraint creation
-# for propositions within that class. For example, you can enforce that "at least one" of the propositions
-# that are instances of this class must be true by using a @constraint decorator.
-# other options include: at most one, exactly one, at most k, and implies all.
-# For a complete module reference, see https://bauhaus.readthedocs.io/en/latest/bauhaus.html
-@constraint.at_least_one(E)
-@proposition(E)
-class FancyPropositions:
+# Function to evaluate a single constraint
+def evaluate_constraint(solution, *args):
+    # Simple implication logic: A -> (B & C)
+    if len(args) == 3:
+        A, B, C = args
+        return not solution[A] or (solution[B] and solution[C])
+    elif len(args) == 2:
+        A, B = args
+        return not solution[A] or solution[B]
+    return True
 
-    def __init__(self, data):
-        self.data = data
-
-    def _prop_name(self):
-        return f"A.{self.data}"
-
-# Call your variables whatever you want
-a = BasicPropositions("a")
-b = BasicPropositions("b")   
-c = BasicPropositions("c")
-d = BasicPropositions("d")
-e = BasicPropositions("e")
-# At least one of these will be true
-x = FancyPropositions("x")
-y = FancyPropositions("y")
-z = FancyPropositions("z")
-
-
-# Build an example full theory for your setting and return it.
-#
-#  There should be at least 10 variables, and a sufficiently large formula to describe it (>50 operators).
-#  This restriction is fairly minimal, and if there is any concern, reach out to the teaching staff to clarify
-#  what the expectations are.
-def example_theory():
-    # Add custom constraints by creating formulas with the variables you created. 
-    E.add_constraint((a | b) & ~x)
-    # Implication
-    E.add_constraint(y >> z)
-    # Negate a formula
-    E.add_constraint(~(x & y))
-    # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
-    # for every instance of BasicPropositions, but you want to enforce it for a, b, and c.:
-    constraint.add_exactly_one(E, a, b, c)
-
-    return E
-
-
-if __name__ == "__main__":
-
-    T = example_theory()
-    # Don't compile until you're finished adding all your constraints!
-    T = T.compile()
-    # After compilation (and only after), you can check some of the properties
-    # of your model:
-    print("\nSatisfiable: %s" % T.satisfiable())
-    print("# Solutions: %d" % count_solutions(T))
-    print("   Solution: %s" % T.solve())
-
-    print("\nVariable likelihoods:")
-    for v,vn in zip([a,b,c,x,y,z], 'abcxyz'):
-        # Ensure that you only send these functions NNF formulas
-        # Literals are compiled to NNF here
-        print(" %s: %.2f" % (vn, likelihood(T, v)))
+# Function to print the current game setup
+def print_game_setup(setup):
+    print("\nCurrent Game Setup:")
+    for i, loc in enumerate(locations):
+        active_elements = [elem for elem in elements if setup[loc[elem]]]
+        print(f"  Location {i + 1}: {', '.join(active_elements) if active_elements else 'No elements'}")
     print()
+
+# Function to provide hints for missing victory conditions
+def check_victory_conditions(solution):
+    hints = []
+    if not any(solution[loc["treasure"]] for loc in locations):
+        hints.append("Ensure at least one location contains a treasure.")
+    return hints
+
+# Function to randomize the setup of locations
+def randomize_locations():
+    setup = {}
+    for loc in locations:
+        for elem in elements:
+            setup[loc[elem]] = randint(0, 1) == 1
+    return setup
+
+# Function to test all combinations for the first location
+def test_all_combos():
+    constraints = generate_constraints()
+    for elem in elements:
+        solution = {var: False for loc in locations for var in loc.values()}
+        solution[locations[0][elem]] = True
+        print(f"\nTesting with {elem} set to True at Location 1:")
+        print_game_setup(solution)
+        if satisfies_constraints(solution, constraints):
+            display_solution(solution)
+        else:
+            print(f"Constraint violation with {elem} set to True.")
+
+# Function to find a solution
+def solve_game():
+    constraints = generate_constraints()
+
+    # Generate all possible solutions
+    all_variables = [var for loc in locations for var in loc.values()]
+    all_combinations = product([False, True], repeat=len(all_variables))
+
+    for combo in all_combinations:
+        solution = dict(zip(all_variables, combo))
+        if satisfies_constraints(solution, constraints):
+            return solution
+    return None
+
+# Function to display the solution
+def display_solution(sol):
+    if not sol:
+        print("No solution found. Victory condition not met.")
+        hints = check_victory_conditions(sol)
+        if hints:
+            print("Hints:")
+            for hint in hints:
+                print(f"  - {hint}")
+        return
+
+    # Check if victory conditions are satisfied
+    victory = any(sol[loc["treasure"]] for loc in locations)
+    if victory:
+        print("Victory achieved! Treasure was found.")
+        for i, loc in enumerate(locations):
+            found_elements = [elem.split("_")[1] for elem in sol if sol[elem] and elem.startswith(f"{i}_")]
+            print(f"Location {i + 1}: {' '.join(found_elements)}")
+    else:
+        print("No victory. Treasure or key elements missing.")
+        hints = check_victory_conditions(sol)
+        if hints:
+            print("Hints:")
+            for hint in hints:
+                print(f"  - {hint}")
+
+# Main function
+if __name__ == "__main__":
+    choice = input('Enter 0 to choose the locations setup, 1 to test all combinations, or any other key to randomize: ')
+
+    if choice == '0':
+        game_setup = randomize_locations()
+        print_game_setup(game_setup)
+    elif choice == '1':
+        test_all_combos()
+    else:
+        game_setup = randomize_locations()
+        print_game_setup(game_setup)
+
+    # Find and display the optimal strategy
+    solution = solve_game()
+    display_solution(solution)
