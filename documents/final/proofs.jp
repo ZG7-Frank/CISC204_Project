@@ -1,0 +1,150 @@
+﻿CONJECTUREPANEL MostEpicSequents
+PROOF "¬R→B, B→P, P→T ⊢ ¬R→T"
+INFER ¬R→B,
+     B→P,
+     P→T 
+     ⊢ ¬R→T 
+FORMULAE
+0 T,
+1 P,
+2 P→T,
+3 B,
+4 B→P,
+5 ¬R,
+6 ¬R→B 
+IS
+SEQ ("→ intro"[A,B\5,0]) (cut[B,C\3,0]) ("→ elim"[A,B\5,3]) (hyp[A\6]) (hyp[A\5]) (cut[B,C\1,0]) ("→ elim"[A,B\3,1]) (hyp[A\4]) (hyp[A\3]) (cut[B,C\0,0]) ("→ elim"[A,B\1,0]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL MostEpicSequents
+PROOF "T∧(D∨Q) ⊢ (T∧D)∨(T∧Q)"
+INFER T∧(D∨Q)
+     ⊢ (T∧D)∨(T∧Q)
+FORMULAE
+0 T∧Q,
+1 T∧D,
+2 Q,
+3 T,
+4 (T∧D)∨(T∧Q),
+5 D,
+6 D∨Q,
+7 T∧(D∨Q),
+8 T∧(D∨Q)
+IS
+SEQ (cut[B,C\3,4]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\3,6]) (hyp[A\7])) (cut[B,C\6,4]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\3,6]) (hyp[A\7])) ("∨ elim"[A,B,C\5,2,4]) (hyp[A\6]) (cut[B,C\1,4]) ("∧ intro"[A,B\3,5]) (hyp[A\3]) (hyp[A\5]) (LAYOUT "∨ intro" (0) ("∨ intro(L)"[B,A\0,1]) (hyp[A\1])) (cut[B,C\0,4]) ("∧ intro"[A,B\3,2]) (hyp[A\3]) (hyp[A\2]) (LAYOUT "∨ intro" (0) ("∨ intro(R)"[B,A\1,0]) (hyp[A\0]))
+END
+CONJECTUREPANEL Theorems
+PROOF "¬¬P ⊢ P"
+INFER ¬¬P 
+     ⊢ P 
+FORMULAE
+0 ⊥,
+1 ¬¬P,
+2 ¬P,
+3 P 
+IS
+SEQ ("contra (classical)"[A\3]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P→Q ⊢ ¬Q→¬P"
+INFER P→Q 
+     ⊢ ¬Q→¬P 
+FORMULAE
+0 ⊥,
+1 ¬Q,
+2 Q,
+3 P,
+4 P→Q,
+5 ¬P 
+IS
+SEQ ("→ intro"[A,B\1,5]) ("¬ intro"[A\3]) (cut[B,C\2,0]) ("→ elim"[A,B\3,2]) (hyp[A\4]) (hyp[A\3]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P→Q, ¬Q ⊢ ¬P"
+INFER P→Q,
+     ¬Q 
+     ⊢ ¬P 
+FORMULAE
+0 ⊥,
+1 ¬Q,
+2 Q,
+3 P,
+4 P→Q 
+IS
+SEQ ("¬ intro"[A\3]) (cut[B,C\2,0]) ("→ elim"[A,B\3,2]) (hyp[A\4]) (hyp[A\3]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL MostEpicSequents
+PROOF "A→¬H, P∧¬H→T ⊢ A∧P→T"
+INFER A→¬H,
+     P∧¬H→T 
+     ⊢ A∧P→T 
+FORMULAE
+0 T,
+1 P∧¬H,
+2 P∧¬H→T,
+3 ¬H,
+4 P,
+5 A,
+6 A→¬H,
+7 A∧P 
+IS
+SEQ ("→ intro"[A,B\7,0]) (cut[B,C\4,0]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\5,4]) (hyp[A\7])) (cut[B,C\5,0]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\5,4]) (hyp[A\7])) (cut[B,C\3,0]) ("→ elim"[A,B\5,3]) (hyp[A\6]) (hyp[A\5]) (cut[B,C\1,0]) ("∧ intro"[A,B\4,3]) (hyp[A\4]) (hyp[A\3]) (cut[B,C\0,0]) ("→ elim"[A,B\1,0]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P∨¬P"
+INFER P∨¬P 
+FORMULAE
+0 ⊥,
+1 ¬(P∨¬P),
+2 P∨¬P,
+3 P,
+4 ¬P,
+5 ¬(P∨¬P)
+IS
+SEQ ("contra (classical)"[A\2]) (cut[B,C\3,0]) ("contra (classical)"[A\3]) (cut[B,C\2,0]) (LAYOUT "∨ intro" (0) ("∨ intro(R)"[B,A\3,4]) (hyp[A\4])) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0]) (cut[B,C\2,0]) (LAYOUT "∨ intro" (0) ("∨ intro(L)"[B,A\4,3]) (hyp[A\3])) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL Theorems
+PROOF "P ⊢ ¬¬P"
+INFER P 
+     ⊢ ¬¬P 
+FORMULAE
+0 ⊥,
+1 ¬P,
+2 P 
+IS
+SEQ ("¬ intro"[A\1]) (cut[B,C\0,0]) ("¬ elim"[B\2]) (hyp[A\2]) (hyp[A\1]) (hyp[A\0])
+END
+CONJECTUREPANEL MostEpicSequents
+PROOF "B→C, P∧¬H→C, A→¬H, C∧A→T ⊢ B∧P∧A→T"
+INFER B→C,
+     P∧¬H→C,
+     A→¬H,
+     C∧A→T 
+     ⊢ B∧P∧A→T 
+FORMULAE
+0 T,
+1 B∧P,
+2 B,
+3 P,
+4 C∧A,
+5 C∧A→T,
+6 A,
+7 C,
+8 B→C,
+9 B∧P∧A,
+10 A→¬H,
+11 ¬H,
+12 P∧¬H→C 
+IS
+SEQ ("→ intro"[A,B\9,0]) (cut[B,C\6,0]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\1,6]) (hyp[A\9])) (cut[B,C\11,0]) ("→ elim"[A,B\6,11]) (hyp[A\10]) (hyp[A\6]) (cut[B,C\1,0]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\1,6]) (hyp[A\9])) (cut[B,C\2,0]) (LAYOUT "∧ elim" (0) ("∧ elim(L)"[A,B\2,3]) (hyp[A\1])) (cut[B,C\7,0]) ("→ elim"[A,B\2,7]) (hyp[A\8]) (hyp[A\2]) (cut[B,C\4,0]) ("∧ intro"[A,B\7,6]) (hyp[A\7]) (hyp[A\6]) (cut[B,C\0,0]) ("→ elim"[A,B\4,0]) (hyp[A\5]) (hyp[A\4]) (cut[B,C\3,0]) (LAYOUT "∧ elim" (0) ("∧ elim(R)"[A,B\2,3]) (hyp[A\1])) (hyp[A\0])
+END
+CONJECTUREPANEL MostEpicSequents
+PROOF "C∧P, T ⊢ C∧P→T"
+INFER C∧P,
+     T 
+     ⊢ C∧P→T 
+FORMULAE
+0 T,
+1 C∧P 
+IS
+SEQ ("→ intro"[A,B\1,0]) (hyp[A\0])
+END
